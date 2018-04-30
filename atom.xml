@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>扑腾</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://junlong.github.io/"/>
+  <updated>2018-04-30T04:14:52.645Z</updated>
+  <id>http://junlong.github.io/</id>
+  
+  <author>
+    <name>putenman</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Adb</title>
+    <link href="http://junlong.github.io/2018/04/30/Adb/"/>
+    <id>http://junlong.github.io/2018/04/30/Adb/</id>
+    <published>2018-04-30T04:06:59.000Z</published>
+    <updated>2018-04-30T04:14:52.645Z</updated>
+    
+    <content type="html"><![CDATA[<p>adb opendir failed, Permission denied</p><a id="more"></a><p>今天第一次通过usb调试模式管理安装的app，通过ls查看安装app的时候，提示没权限，找到的解决过程记下来</p><pre><code>D:\Android-SDK\platform-tools&gt;adb shell ls /dataopendir failed, Permission denied（没有权限）</code></pre><p>现在问题是我已经root：<br>google找到adb shell可以su root切换用户，切换之后就不再报权限的错误了。附带找到修改app应用配置文件的内容一并记下来。</p><p>从理论上说，USB调试模式下，不Root的机器就可以刷机，既然连rom都可以刷，那么应该是可以读写root分区下的文件了吧？而且我要修改的只是某个应用的data文件，并没有去修改system系统文件。</p><p>不需要Root，用Android SDK的adb工具就能搞定。只需要手机开启“USB调试模式”就可以。</p><p>把需要修改的文件copy到SD卡根目录，以方便修改和覆盖：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb shell su -c &quot;cat /data/data/com.spryfox.tripletown/shared_prefs/com.spryfox.tripletown.xml &gt;/mnt/sdcard/111.txt&quot; root</code></pre><p>把该文件从手机传到电脑：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb pull /mnt/sdcard/111.txt d:\111.txt743 KB/s (11899 bytes in 0.015s)</code></pre><p>用任意一款文本编辑器，编辑电脑里的 d:\111.txt<br>修改，保存</p><p>把该文件传回手机：</p><pre><code>D:\Android-SDK\platform-tools&gt;adb push d:\111.txt /mnt/sdcard/111.txt57 KB/s (11928 bytes in 0.203s)</code></pre><p>把该文件覆盖设备系统data目录的配置文件：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb shell su -c &quot;cat /mnt/sdcard/111.txt &gt;/data/data/com.spryfox.tripletown/shared_prefs/com.spryfox.tripletown.xml&quot; root</code></pre><p>最后，删除SD卡根目录的 111.txt 搞定！！</p><p><a href="http://bbs.xiaomi.cn/thread-5604971-1-1.html" target="_blank" rel="noopener">http://bbs.xiaomi.cn/thread-5604971-1-1.html</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;adb opendir failed, Permission denied&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Tech" scheme="http://junlong.github.io/categories/Tech/"/>
+    
+    
+      <category term="android" scheme="http://junlong.github.io/tags/android/"/>
+    
+      <category term="adb" scheme="http://junlong.github.io/tags/adb/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Maven notes</title>
+    <link href="http://junlong.github.io/2015/11/13/maven/"/>
+    <id>http://junlong.github.io/2015/11/13/maven/</id>
+    <published>2015-11-13T06:57:55.000Z</published>
+    <updated>2018-04-30T04:33:17.553Z</updated>
+    
+    <content type="html"><![CDATA[<p>Project Object Model</p><p>简单理解一个应用由多个project构成，其中一个project为parent（packaging类型为pom），而其他的project为model（packaging类型为jar）同时继承parent从而构成一个树状结构。</p><a id="more"></a><pre><code>. |-- web-module |   `-- pom.xml `-- pom.xml&lt;!--parent pom中的配置--&gt;&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;&lt;groupId&gt;com.flybird.tutorial&lt;/groupId&gt;&lt;artifactId&gt;tutorial-parent&lt;/artifactId&gt;&lt;version&gt;1.0&lt;/version&gt;&lt;packaging&gt;pom&lt;/packaging&gt;&lt;modules&gt;     &lt;module&gt;app/web&lt;/module&gt;&lt;/modules&gt;&lt;!--继承parent pom中的配置--&gt;&lt;parent&gt;    &lt;groupId&gt;com.flybird.tutorial&lt;/groupId&gt;    &lt;artifactId&gt;tutorial-parent&lt;/artifactId&gt;    &lt;version&gt;1.0&lt;/version&gt;    &lt;relativePath&gt;../../pom.xml&lt;/relativePath&gt;&lt;/parent&gt;&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;&lt;groupId&gt;com.flybird.tutorial&lt;/groupId&gt;&lt;artifactId&gt;tutorial-web&lt;/artifactId&gt;&lt;version&gt;1.0&lt;/version&gt;&lt;packaging&gt;war&lt;/packaging&gt;</code></pre><p><strong>将parent pom安装到本地repo</strong></p><pre><code>在parent pom目录执行命令mvn -N install</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Project Object Model&lt;/p&gt;
+&lt;p&gt;简单理解一个应用由多个project构成，其中一个project为parent（packaging类型为pom），而其他的project为model（packaging类型为jar）同时继承parent从而构成一个树状结构。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Tech" scheme="http://junlong.github.io/categories/Tech/"/>
+    
+    
+      <category term="java" scheme="http://junlong.github.io/tags/java/"/>
+    
+      <category term="maven" scheme="http://junlong.github.io/tags/maven/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>route service</title>
+    <link href="http://junlong.github.io/2015/08/27/route_service/"/>
+    <id>http://junlong.github.io/2015/08/27/route_service/</id>
+    <published>2015-08-27T13:11:55.000Z</published>
+    <updated>2018-04-30T08:24:08.953Z</updated>
+    
+    <content type="html"><![CDATA[<p>和其他厂一样阿里也有造轮子的习惯，基于mina搞了个二进制协议TBRemoting，替换冗余低效的wsdl。虽然是大大减少了网络数据传输量提升了性能，但配套设施却没跟上对于开发测试并不友好。对于标准wsdl而言通过soupui就可快速构造请求测试服务端接口是否ok，二进制协议TBRemoting却没有相应的配套工具。与此同时由于存在接口参数定义不规范（如入参Bean中包含getXXX方法却不实际包含XXX这个属性）导致cxf无法正确进行序列化，导致无法通过soupui之类的工具构造请求。工欲善其事，必先利其器，挽起袖子自己干。</p><a id="more"></a><p><strong>新增路由接口作为门面，以json字符串描述目标接口参数</strong></p><ol><li><p>将目标接口元数据与入参一起打包封装为路由接口入参，路由接口解析参数将请求转发至目标接口处理<br>service req–&gt;route service req–&gt;route service –&gt; service</p></li><li><p>路由接口设计</p></li></ol><p><img src="/images/routeService.JPG" alt="route service"></p><ol start="3"><li>举例说明</li></ol><pre>目标接口：com.helloworld.Service目标方法：sayHello(String msg)目标接口入参：helloworld目标接口返回类型：StringRouteOrder order = new RouteOrder();order.setServiceName("com.helloworld.Service");order.setMethodName("sayHello");Class<?>[] types = { String.class};List<string> parameterTypes = new ArrayList<string>();for (int i = 0; i < types.length; i++) {    parameterTypes.add(types[i].getName());}order.setParameterTypes(parameterTypes);List<string> parameters = new ArrayList<string>();parameters.add(JSONObject.toJSONString("helloworld"));order.setParameters(parameters);RouteResult routeResult = routeService.route(order);String result = (String) routeResult.getResult();</string></string></string></string></pre>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;和其他厂一样阿里也有造轮子的习惯，基于mina搞了个二进制协议TBRemoting，替换冗余低效的wsdl。虽然是大大减少了网络数据传输量提升了性能，但配套设施却没跟上对于开发测试并不友好。对于标准wsdl而言通过soupui就可快速构造请求测试服务端接口是否ok，二进制协议TBRemoting却没有相应的配套工具。与此同时由于存在接口参数定义不规范（如入参Bean中包含getXXX方法却不实际包含XXX这个属性）导致cxf无法正确进行序列化，导致无法通过soupui之类的工具构造请求。工欲善其事，必先利其器，挽起袖子自己干。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Tech" scheme="http://junlong.github.io/categories/Tech/"/>
+    
+    
+      <category term="java" scheme="http://junlong.github.io/tags/java/"/>
+    
+      <category term="cxf" scheme="http://junlong.github.io/tags/cxf/"/>
+    
+      <category term="rpc" scheme="http://junlong.github.io/tags/rpc/"/>
+    
+      <category term="proxy" scheme="http://junlong.github.io/tags/proxy/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>virtual box setting</title>
+    <link href="http://junlong.github.io/2015/06/05/virtualbox/"/>
+    <id>http://junlong.github.io/2015/06/05/virtualbox/</id>
+    <published>2015-06-05T08:19:55.000Z</published>
+    <updated>2018-04-30T08:33:17.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>厂长太抠门，不给配mac，无奈安装virtualbox搞个ubuntu提供linux（vm）环境。基本需求就是利用linux提供app编译和运行环境，编码什么的主要还是在win7（host）上面搞。大学网络课的东西忘得差不多了-_-!</p><a id="more"></a><p>virtualbox支持host和vm之间端口映射，真是屌丝打家劫舍必备神技。</p><p>####Host ssh连接虚拟机<br>1.将vm网络配置为NAT模式</p><p><img src="/images/vbox_nat.JPG" alt="virtualbox nat"></p><p>除通过GUI外也可在virtualbox bin目录通过命令行操作</p><pre><code>VBoxManage modifyvm vm_name --natpf1 &quot;ssh,tcp,,3022,,22&quot;</code></pre><p>where ‘vm_name’ is the name of the created VM.Check the added rules:</p><pre><code>VBoxManage showvminfo myserver | grep &apos;Rule&apos;</code></pre><p>2.配置端口映射,Host为3022，vm为22(ssh server默认监听端口)</p><p><img src="/images/vbox_nat_fowarding.JPG" alt="virtualbox port fowarding"></p><p>3.vm安装ssh server</p><pre><code>sudo apt-get install openssh-server</code></pre><p>4.host ssh登录vm</p><pre><code>junlung6@127.0.0.1 3022</code></pre><p><a href="http://stackoverflow.com/users/1100523/vkostromin" title="thanks vkostromin" target="_blank" rel="noopener">Thanks to vkostromin</a></p><p>####Host开发Guest部署<br>vm搞个share folder指向host的代码目录project，利用vm linux环境部署应用，最后继续使用神技配置端口映射，在host通过本机ip访问指定端口，进而可直接访问vm中的应用。以solr为例使用端口映射神技实现host开发vm部署。</p><p>Create mount point named projects</p><pre><code>junlung6@junlung6:~$mkdir ~/projects</code></pre><p>Assign mount point(~/projects/) to virtualbox share folder ‘’projects’’</p><pre><code>sudo mount -t vboxsf projects ~/projects/ </code></pre><p>Deploy solr</p><pre><code>junlung6@junlung6:~$ cd projects/solr-5.1.0/junlung6@junlung6:~/projects/solr-5.1.0$ lsbin  CHANGES.txt  contrib  dist  docs  example  licenses  LICENSE.txt  LUCENE_CHANGES.txt  NOTICE.txt  README.txt  serverjunlung6@junlung6:~/projects/solr-5.1.0$ bin/solr start</code></pre><p>Visit just as it is</p><pre><code>http://localhost:8983/solr</code></pre><h4 id="NAT网卡负责访问网络，Host-only-Adapter网卡负责host与guest通信"><a href="#NAT网卡负责访问网络，Host-only-Adapter网卡负责host与guest通信" class="headerlink" title="NAT网卡负责访问网络，Host-only Adapter网卡负责host与guest通信"></a>NAT网卡负责访问网络，Host-only Adapter网卡负责host与guest通信</h4><p><img src="/images/vbox_adaptor.JPG" alt="virtualbox port fowarding"></p><p>设置host的adaptor的网卡ip地址与guest通信的eth1地址在一个网段，如guest eth1的ip地址若为192.168.56.101，host可设置为192.168.56.121<br><img src="/images/vbox_adaptor_host.JPG" alt="virtualbox port fowarding"></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;厂长太抠门，不给配mac，无奈安装virtualbox搞个ubuntu提供linux（vm）环境。基本需求就是利用linux提供app编译和运行环境，编码什么的主要还是在win7（host）上面搞。大学网络课的东西忘得差不多了-_-!&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Tech" scheme="http://junlong.github.io/categories/Tech/"/>
+    
+    
+      <category term="devops" scheme="http://junlong.github.io/tags/devops/"/>
+    
+      <category term="virtualbox" scheme="http://junlong.github.io/tags/virtualbox/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>shadowsocks</title>
+    <link href="http://junlong.github.io/2015/05/26/shadowsocks/"/>
+    <id>http://junlong.github.io/2015/05/26/shadowsocks/</id>
+    <published>2015-05-26T12:29:45.000Z</published>
+    <updated>2018-04-30T04:28:58.862Z</updated>
+    
+    <content type="html"><![CDATA[<p>####1.deploy shadowsocks<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">#main</span><br><span class="line"># -y  Assume Yes to all queries and do not prompt</span><br><span class="line">apt-get update &amp;&amp; apt-get -y install python-pip</span><br><span class="line">pip install shadowsocks</span><br><span class="line"></span><br><span class="line">cd /root</span><br><span class="line">cat &gt; ss.json &lt;&lt;EOF</span><br><span class="line">&#123;</span><br><span class="line">    &quot;server&quot;:&quot;0.0.0.0&quot;,</span><br><span class="line">    &quot;server_port&quot;:443,</span><br><span class="line">    &quot;local_port&quot;:1080,</span><br><span class="line">    &quot;password&quot;:&quot;password&quot;,</span><br><span class="line">    &quot;timeout&quot;:303,</span><br><span class="line">    &quot;method&quot;:&quot;aes-256-cfb&quot;,</span><br><span class="line">    &quot;workers&quot;:2</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">#open fast </span><br><span class="line">echo 3 &gt; /proc/sys/net/ipv4/tcp_fastopen</span><br><span class="line">ssserver -c ss.json --fast-open -d start</span><br></pre></td></tr></table></figure></p><p>####2.shell notes<br>    EOF（End OF File）在Linux命令和脚本中表示用户自定义终止符，其用法如下：</p><pre><code>&lt;&lt; EOF...EOF其中的&quot;...&quot;表示用户输入内容。说明：EOF只是一个标示符，可以用其它非关键字符或字符串来代替，例如：&lt;&lt; abc.....abc先举一个简单的例子，例1：# cat &lt;&lt; EOF在出现输入提示符&quot;&gt;&quot;，输入以下内容：&gt; Hello&gt; EOF输入结束后，在终端显示以下内容：Hello</code></pre><p>cat命令操作对象是文件，但是例1中cat的操作对象不是文件，而是用户输入。<br>可以理解例1：先在文件file中输入“Hello”，再用cat file输出内容。也就是说我们可以用一个文件来替代”&lt;&lt; EOF EOF”。反过来说，如果操作命令中的文件是输入对象，也可以用”&lt;&lt; EOF EOF”来替代的</p><p><a href="http://blog.csdn.net/simon_dong618/article/details/11674279" target="_blank" rel="noopener">read more simon_dong618</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;####1.deploy shadowsocks&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class
+      
+    
+    </summary>
+    
+      <category term="Tech" scheme="http://junlong.github.io/categories/Tech/"/>
+    
+    
+      <category term="gfw" scheme="http://junlong.github.io/tags/gfw/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>try docker</title>
+    <link href="http://junlong.github.io/2015/05/14/try_docker/"/>
+    <id>http://junlong.github.io/2015/05/14/try_docker/</id>
+    <published>2015-05-14T08:39:53.000Z</published>
+    <updated>2018-04-30T08:34:07.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>经常被各种环境问题折腾，docker出来后一直打算试试。昨天搞了个虚拟机折腾了一下，尼玛发现不支持32位的guest，重新搞了一个最新版本的64位ubuntu，终于可以pull image坑爹竟然又出现无法在host和guest之间share文件。</p><a id="more"></a><p>####Virtualbox shared folder<br><img src="/images/vbox_sharefolder.JPG" alt="virtualbox share"></p><p>Create mount point named share</p><pre><code>junlung6@junlung6:~$mkdir ~/share</code></pre><p>Assign mount point(~/share/) to virtualbox share folder ‘’share’’</p><pre><code>sudo mount -t vboxsf share ~/share/ </code></pre><p>####Create docker image<br>1.pull original image from docker hub registry</p><pre><code>junlung6@junlung6:~$sudo docker pull ubuntujunlung6@junlung6:~$sudo docker imagesjunlung6@junlung6:~$sudo docker run -i -t ubuntu:latest /bin/bash</code></pre><p>2.install app in container then exit</p><pre><code>root@31e3359a74a2:/# apt-get install javaroot@31e3359a74a2:/# apt-get install gitroot@31e3359a74a2:/# which javaroot@31e3359a74a2:/# exit</code></pre><p>3.create image from container</p><pre><code>sudo docker commit 31e3359a74a2 ubuntu-with-java</code></pre><p>4.give new image a try</p><pre><code>sudo docker run -i -t ubuntu-with-java /bin/bashwhich java</code></pre><p>5.run hello world</p><pre><code>junlung6@junlung6:~$ sudo mount -t vboxsf share ~/share/junlung6@junlung6:~$ ls ~/share/projects/tomacat-helloworldjunlung6@junlung6:~$ sudo docker run -v ~/share/projects:/opt/projects ubuntu-with-java ls -l /opt/projectstotal 4drwxrwxrwx 1 root root 4096 May 13 08:29 tomacat-helloworldjunlung6@junlung6:~$ sudo docker run -v ~/share/projects:/opt/projects ubuntu-with-java java -jar /opt/projects/tomacat-helloworld/target/tomacat-helloworld-1.0-SNAPSHOT.jarHello World!</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;经常被各种环境问题折腾，docker出来后一直打算试试。昨天搞了个虚拟机折腾了一下，尼玛发现不支持32位的guest，重新搞了一个最新版本的64位ubuntu，终于可以pull image坑爹竟然又出现无法在host和guest之间share文件。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Tech" scheme="http://junlong.github.io/categories/Tech/"/>
+    
+    
+      <category term="devops" scheme="http://junlong.github.io/tags/devops/"/>
+    
+      <category term="docker" scheme="http://junlong.github.io/tags/docker/"/>
+    
+      <category term="ubuntu" scheme="http://junlong.github.io/tags/ubuntu/"/>
+    
+  </entry>
+  
+</feed>

@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Adb · 扑腾</title><meta name="description" content="adb opendir failed, Permission denied"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/prontera.css"><link rel="search" type="application/opensearchdescription+xml" href="http://junlong.github.io/atom.xml" title="扑腾"></head><body><header class="feature-header"><nav class="component-nav"><ul><div class="logo-container"><a href="/"><h2 class="title">扑腾</h2></a></div><a href="/" target="_self" class="li component-nav-item"><p>INDEX</p></a><a href="/archives" target="_self" class="li component-nav-item"><p>ARCHIVES</p></a><a href="/about" target="_self" class="li component-nav-item"><p>ABOUT</p></a><ul class="shortcut-icons"><a href="https://github.com/AngryPowman" target="_blank"><img src="/images/github.svg" class="icon"></a><a href="/atom.xml" target="_blank"><img src="/images/rss.svg" class="icon"></a></ul></ul></nav></header><main class="container"><div id="post-container"><div class="post"><article class="post-block"><h1 class="post-title">Adb</h1><div class="post-info">2018年4月30日</div><div class="post-content"><p>adb opendir failed, Permission denied</p>
+<a id="more"></a>
+<p>今天第一次通过usb调试模式管理安装的app，通过ls查看安装app的时候，提示没权限，找到的解决过程记下来</p>
+<pre><code>D:\Android-SDK\platform-tools&gt;adb shell ls /data
+opendir failed, Permission denied（没有权限）
+</code></pre><p>现在问题是我已经root：<br>google找到adb shell可以su root切换用户，切换之后就不再报权限的错误了。附带找到修改app应用配置文件的内容一并记下来。</p>
+<p>从理论上说，USB调试模式下，不Root的机器就可以刷机，既然连rom都可以刷，那么应该是可以读写root分区下的文件了吧？而且我要修改的只是某个应用的data文件，并没有去修改system系统文件。</p>
+<p>不需要Root，用Android SDK的adb工具就能搞定。只需要手机开启“USB调试模式”就可以。</p>
+<p>把需要修改的文件copy到SD卡根目录，以方便修改和覆盖：</p>
+<pre><code>D:\Android-SDK\platform-tools&gt; adb shell su -c &quot;cat /data/data/com.spryfox.tripletown/shared_prefs/com.spryfox.tripletown.xml &gt;/mnt/sdcard/111.txt&quot; root
+</code></pre><p>把该文件从手机传到电脑：</p>
+<pre><code>D:\Android-SDK\platform-tools&gt; adb pull /mnt/sdcard/111.txt d:\111.txt
+743 KB/s (11899 bytes in 0.015s)
+</code></pre><p>用任意一款文本编辑器，编辑电脑里的 d:\111.txt<br>修改，保存</p>
+<p>把该文件传回手机：</p>
+<pre><code>D:\Android-SDK\platform-tools&gt;adb push d:\111.txt /mnt/sdcard/111.txt
+57 KB/s (11928 bytes in 0.203s)
+</code></pre><p>把该文件覆盖设备系统data目录的配置文件：</p>
+<pre><code>D:\Android-SDK\platform-tools&gt; adb shell su -c &quot;cat /mnt/sdcard/111.txt &gt;/data/data/com.spryfox.tripletown/shared_prefs/com.spryfox.tripletown.xml&quot; root
+</code></pre><p>最后，删除SD卡根目录的 111.txt 搞定！！</p>
+<p><a href="http://bbs.xiaomi.cn/thread-5604971-1-1.html" target="_blank" rel="noopener">http://bbs.xiaomi.cn/thread-5604971-1-1.html</a></p>
+</div></article></div><div id="disqus_thread"></div></div><script>var disqus_shortname = 'junlong';
+var disqus_identifier = '2018/04/30/Adb/';
+var disqus_title = 'Adb';
+var disqus_url = 'http://junlong.github.io/2018/04/30/Adb/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//junlong.disqus.com/count.js" async></script></main><footer class="footer-container"><div class="paginator"><a href="/2015/11/13/maven/" class="next">下一篇</a></div><div class="copyright"><p>© 2014 - 2018 <a href="http://junlong.github.io">putenman</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/AngryPowman/hexo-theme-prontera" target="_blank">hexo-theme-prontera</a>.</p></div></footer></body></html>

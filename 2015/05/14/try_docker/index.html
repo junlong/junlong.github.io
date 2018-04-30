@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> try docker · 扑腾</title><meta name="description" content="docker"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/prontera.css"><link rel="search" type="application/opensearchdescription+xml" href="http://junlong.github.io/atom.xml" title="扑腾"></head><body><header class="feature-header"><nav class="component-nav"><ul><div class="logo-container"><a href="/"><h2 class="title">扑腾</h2></a></div><a href="/" target="_self" class="li component-nav-item"><p>INDEX</p></a><a href="/archives" target="_self" class="li component-nav-item"><p>ARCHIVES</p></a><a href="/about" target="_self" class="li component-nav-item"><p>ABOUT</p></a><ul class="shortcut-icons"><a href="https://github.com/AngryPowman" target="_blank"><img src="/images/github.svg" class="icon"></a><a href="/atom.xml" target="_blank"><img src="/images/rss.svg" class="icon"></a></ul></ul></nav></header><main class="container"><div id="post-container"><div class="post"><article class="post-block"><h1 class="post-title">try docker</h1><div class="post-info">2015年5月14日</div><div class="post-content"><p>经常被各种环境问题折腾，docker出来后一直打算试试。昨天搞了个虚拟机折腾了一下，尼玛发现不支持32位的guest，重新搞了一个最新版本的64位ubuntu，终于可以pull image坑爹竟然又出现无法在host和guest之间share文件。</p>
+<a id="more"></a>
+<p>####Virtualbox shared folder<br><img src="/images/vbox_sharefolder.JPG" alt="virtualbox share"></p>
+<p>Create mount point named share</p>
+<pre><code>junlung6@junlung6:~$mkdir ~/share
+</code></pre><p>Assign mount point(~/share/) to virtualbox share folder ‘’share’’</p>
+<pre><code>sudo mount -t vboxsf share ~/share/ 
+</code></pre><p>####Create docker image<br>1.pull original image from docker hub registry</p>
+<pre><code>junlung6@junlung6:~$sudo docker pull ubuntu
+
+junlung6@junlung6:~$sudo docker images
+
+junlung6@junlung6:~$sudo docker run -i -t ubuntu:latest /bin/bash
+</code></pre><p>2.install app in container then exit</p>
+<pre><code>root@31e3359a74a2:/# apt-get install java
+root@31e3359a74a2:/# apt-get install git
+root@31e3359a74a2:/# which java
+root@31e3359a74a2:/# exit
+</code></pre><p>3.create image from container</p>
+<pre><code>sudo docker commit 31e3359a74a2 ubuntu-with-java
+</code></pre><p>4.give new image a try</p>
+<pre><code>sudo docker run -i -t ubuntu-with-java /bin/bash
+which java
+</code></pre><p>5.run hello world</p>
+<pre><code>junlung6@junlung6:~$ sudo mount -t vboxsf share ~/share/
+junlung6@junlung6:~$ ls ~/share/projects/
+tomacat-helloworld
+junlung6@junlung6:~$ sudo docker run -v ~/share/projects:/opt/projects ubuntu-with-java ls -l /opt/projects
+total 4
+drwxrwxrwx 1 root root 4096 May 13 08:29 tomacat-helloworld
+junlung6@junlung6:~$ sudo docker run -v ~/share/projects:/opt/projects ubuntu-with-java java -jar /opt/projects/tomacat-helloworld/target/tomacat-helloworld-1.0-SNAPSHOT.jar
+Hello World!
+</code></pre></div></article></div><div id="disqus_thread"></div></div><script>var disqus_shortname = 'junlong';
+var disqus_identifier = '2015/05/14/try_docker/';
+var disqus_title = 'try docker';
+var disqus_url = 'http://junlong.github.io/2015/05/14/try_docker/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//junlong.disqus.com/count.js" async></script></main><footer class="footer-container"><div class="paginator"><a href="/2015/05/26/shadowsocks/" class="prev">上一篇</a></div><div class="copyright"><p>© 2014 - 2018 <a href="http://junlong.github.io">putenman</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/AngryPowman/hexo-theme-prontera" target="_blank">hexo-theme-prontera</a>.</p></div></footer></body></html>

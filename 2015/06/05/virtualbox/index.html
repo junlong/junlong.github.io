@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> virtual box setting · 扑腾</title><meta name="description" content="virtualbox"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/prontera.css"><link rel="search" type="application/opensearchdescription+xml" href="http://junlong.github.io/atom.xml" title="扑腾"></head><body><header class="feature-header"><nav class="component-nav"><ul><div class="logo-container"><a href="/"><h2 class="title">扑腾</h2></a></div><a href="/" target="_self" class="li component-nav-item"><p>INDEX</p></a><a href="/archives" target="_self" class="li component-nav-item"><p>ARCHIVES</p></a><a href="/about" target="_self" class="li component-nav-item"><p>ABOUT</p></a><ul class="shortcut-icons"><a href="https://github.com/AngryPowman" target="_blank"><img src="/images/github.svg" class="icon"></a><a href="/atom.xml" target="_blank"><img src="/images/rss.svg" class="icon"></a></ul></ul></nav></header><main class="container"><div id="post-container"><div class="post"><article class="post-block"><h1 class="post-title">virtual box setting</h1><div class="post-info">2015年6月5日</div><div class="post-content"><p>厂长太抠门，不给配mac，无奈安装virtualbox搞个ubuntu提供linux（vm）环境。基本需求就是利用linux提供app编译和运行环境，编码什么的主要还是在win7（host）上面搞。大学网络课的东西忘得差不多了-_-!</p>
+<a id="more"></a>
+<p>virtualbox支持host和vm之间端口映射，真是屌丝打家劫舍必备神技。</p>
+<p>####Host ssh连接虚拟机<br>1.将vm网络配置为NAT模式</p>
+<p><img src="/images/vbox_nat.JPG" alt="virtualbox nat"></p>
+<p>除通过GUI外也可在virtualbox bin目录通过命令行操作</p>
+<pre><code>VBoxManage modifyvm vm_name --natpf1 &quot;ssh,tcp,,3022,,22&quot;
+</code></pre><p>where ‘vm_name’ is the name of the created VM.Check the added rules:</p>
+<pre><code>VBoxManage showvminfo myserver | grep &apos;Rule&apos;
+</code></pre><p>2.配置端口映射,Host为3022，vm为22(ssh server默认监听端口)</p>
+<p><img src="/images/vbox_nat_fowarding.JPG" alt="virtualbox port fowarding"></p>
+<p>3.vm安装ssh server</p>
+<pre><code>sudo apt-get install openssh-server
+</code></pre><p>4.host ssh登录vm</p>
+<pre><code>junlung6@127.0.0.1 3022
+</code></pre><p><a href="http://stackoverflow.com/users/1100523/vkostromin" title="thanks vkostromin" target="_blank" rel="noopener">Thanks to vkostromin</a></p>
+<p>####Host开发Guest部署<br>vm搞个share folder指向host的代码目录project，利用vm linux环境部署应用，最后继续使用神技配置端口映射，在host通过本机ip访问指定端口，进而可直接访问vm中的应用。以solr为例使用端口映射神技实现host开发vm部署。</p>
+<p>Create mount point named projects</p>
+<pre><code>junlung6@junlung6:~$mkdir ~/projects
+</code></pre><p>Assign mount point(~/projects/) to virtualbox share folder ‘’projects’’</p>
+<pre><code>sudo mount -t vboxsf projects ~/projects/ 
+</code></pre><p>Deploy solr</p>
+<pre><code>junlung6@junlung6:~$ cd projects/solr-5.1.0/
+junlung6@junlung6:~/projects/solr-5.1.0$ ls
+bin  CHANGES.txt  contrib  dist  docs  example  licenses  LICENSE.txt  LUCENE_CHANGES.txt  NOTICE.txt  README.txt  server
+junlung6@junlung6:~/projects/solr-5.1.0$ bin/solr start
+</code></pre><p>Visit just as it is</p>
+<pre><code>http://localhost:8983/solr
+</code></pre><h4 id="NAT网卡负责访问网络，Host-only-Adapter网卡负责host与guest通信"><a href="#NAT网卡负责访问网络，Host-only-Adapter网卡负责host与guest通信" class="headerlink" title="NAT网卡负责访问网络，Host-only Adapter网卡负责host与guest通信"></a>NAT网卡负责访问网络，Host-only Adapter网卡负责host与guest通信</h4><p><img src="/images/vbox_adaptor.JPG" alt="virtualbox port fowarding"></p>
+<p>设置host的adaptor的网卡ip地址与guest通信的eth1地址在一个网段，如guest eth1的ip地址若为192.168.56.101，host可设置为192.168.56.121<br><img src="/images/vbox_adaptor_host.JPG" alt="virtualbox port fowarding"></p>
+</div></article></div><div id="disqus_thread"></div></div><script>var disqus_shortname = 'junlong';
+var disqus_identifier = '2015/06/05/virtualbox/';
+var disqus_title = 'virtual box setting';
+var disqus_url = 'http://junlong.github.io/2015/06/05/virtualbox/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//junlong.disqus.com/count.js" async></script></main><footer class="footer-container"><div class="paginator"><a href="/2015/08/27/route_service/" class="prev">上一篇</a><a href="/2015/05/26/shadowsocks/" class="next">下一篇</a></div><div class="copyright"><p>© 2014 - 2018 <a href="http://junlong.github.io">putenman</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/AngryPowman/hexo-theme-prontera" target="_blank">hexo-theme-prontera</a>.</p></div></footer></body></html>
