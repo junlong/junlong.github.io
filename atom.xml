@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://junlong.github.io/"/>
-  <updated>2018-04-30T04:14:52.645Z</updated>
+  <updated>2018-04-30T04:33:17.553Z</updated>
   <id>http://junlong.github.io/</id>
   
   <author>
@@ -15,30 +15,6 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>Adb</title>
-    <link href="http://junlong.github.io/2018/04/30/Adb/"/>
-    <id>http://junlong.github.io/2018/04/30/Adb/</id>
-    <published>2018-04-30T04:06:59.000Z</published>
-    <updated>2018-04-30T04:14:52.645Z</updated>
-    
-    <content type="html"><![CDATA[<p>adb opendir failed, Permission denied</p><a id="more"></a><p>今天第一次通过usb调试模式管理安装的app，通过ls查看安装app的时候，提示没权限，找到的解决过程记下来</p><pre><code>D:\Android-SDK\platform-tools&gt;adb shell ls /dataopendir failed, Permission denied（没有权限）</code></pre><p>现在问题是我已经root：<br>google找到adb shell可以su root切换用户，切换之后就不再报权限的错误了。附带找到修改app应用配置文件的内容一并记下来。</p><p>从理论上说，USB调试模式下，不Root的机器就可以刷机，既然连rom都可以刷，那么应该是可以读写root分区下的文件了吧？而且我要修改的只是某个应用的data文件，并没有去修改system系统文件。</p><p>不需要Root，用Android SDK的adb工具就能搞定。只需要手机开启“USB调试模式”就可以。</p><p>把需要修改的文件copy到SD卡根目录，以方便修改和覆盖：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb shell su -c &quot;cat /data/data/com.spryfox.tripletown/shared_prefs/com.spryfox.tripletown.xml &gt;/mnt/sdcard/111.txt&quot; root</code></pre><p>把该文件从手机传到电脑：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb pull /mnt/sdcard/111.txt d:\111.txt743 KB/s (11899 bytes in 0.015s)</code></pre><p>用任意一款文本编辑器，编辑电脑里的 d:\111.txt<br>修改，保存</p><p>把该文件传回手机：</p><pre><code>D:\Android-SDK\platform-tools&gt;adb push d:\111.txt /mnt/sdcard/111.txt57 KB/s (11928 bytes in 0.203s)</code></pre><p>把该文件覆盖设备系统data目录的配置文件：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb shell su -c &quot;cat /mnt/sdcard/111.txt &gt;/data/data/com.spryfox.tripletown/shared_prefs/com.spryfox.tripletown.xml&quot; root</code></pre><p>最后，删除SD卡根目录的 111.txt 搞定！！</p><p><a href="http://bbs.xiaomi.cn/thread-5604971-1-1.html" target="_blank" rel="noopener">http://bbs.xiaomi.cn/thread-5604971-1-1.html</a></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;adb opendir failed, Permission denied&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Tech" scheme="http://junlong.github.io/categories/Tech/"/>
-    
-    
-      <category term="android" scheme="http://junlong.github.io/tags/android/"/>
-    
-      <category term="adb" scheme="http://junlong.github.io/tags/adb/"/>
-    
-  </entry>
   
   <entry>
     <title>Maven notes</title>
@@ -165,6 +141,30 @@
       <category term="docker" scheme="http://junlong.github.io/tags/docker/"/>
     
       <category term="ubuntu" scheme="http://junlong.github.io/tags/ubuntu/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Adb</title>
+    <link href="http://junlong.github.io/2013/08/09/Adb/"/>
+    <id>http://junlong.github.io/2013/08/09/Adb/</id>
+    <published>2013-08-09T15:04:10.000Z</published>
+    <updated>2018-04-30T09:58:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>adb opendir failed, Permission denied</p><a id="more"></a><p>今天第一次通过usb调试模式管理安装的app，通过ls查看安装app的时候，提示没权限，找到的解决过程记下来</p><pre><code>D:\Android-SDK\platform-tools&gt;adb shell ls /dataopendir failed, Permission denied（没有权限）</code></pre><p>现在问题是我已经root：<br>google找到adb shell可以su root切换用户，切换之后就不再报权限的错误了。附带找到修改app应用配置文件的内容一并记下来。</p><p>从理论上说，USB调试模式下，不Root的机器就可以刷机，既然连rom都可以刷，那么应该是可以读写root分区下的文件了吧？而且我要修改的只是某个应用的data文件，并没有去修改system系统文件。</p><p>不需要Root，用Android SDK的adb工具就能搞定。只需要手机开启“USB调试模式”就可以。</p><p>把需要修改的文件copy到SD卡根目录，以方便修改和覆盖：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb shell su -c &quot;cat /data/data/com.spryfox.tripletown/shared_prefs/com.spryfox.tripletown.xml &gt;/mnt/sdcard/111.txt&quot; root</code></pre><p>把该文件从手机传到电脑：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb pull /mnt/sdcard/111.txt d:\111.txt743 KB/s (11899 bytes in 0.015s)</code></pre><p>用任意一款文本编辑器，编辑电脑里的 d:\111.txt<br>修改，保存</p><p>把该文件传回手机：</p><pre><code>D:\Android-SDK\platform-tools&gt;adb push d:\111.txt /mnt/sdcard/111.txt57 KB/s (11928 bytes in 0.203s)</code></pre><p>把该文件覆盖设备系统data目录的配置文件：</p><pre><code>D:\Android-SDK\platform-tools&gt; adb shell su -c &quot;cat /mnt/sdcard/111.txt &gt;/data/data/com.spryfox.tripletown/shared_prefs/com.spryfox.tripletown.xml&quot; root</code></pre><p>最后，删除SD卡根目录的 111.txt 搞定！！</p><p><a href="http://bbs.xiaomi.cn/thread-5604971-1-1.html" target="_blank" rel="noopener">http://bbs.xiaomi.cn/thread-5604971-1-1.html</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;adb opendir failed, Permission denied&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Tech" scheme="http://junlong.github.io/categories/Tech/"/>
+    
+    
+      <category term="android" scheme="http://junlong.github.io/tags/android/"/>
+    
+      <category term="adb" scheme="http://junlong.github.io/tags/adb/"/>
     
   </entry>
   
